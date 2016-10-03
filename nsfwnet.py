@@ -15,6 +15,7 @@ from PIL import Image
 from StringIO import StringIO
 import caffe
 
+nsfwnet = None
 
 def resize_image(data, sz=(256, 256)):
     """
@@ -100,8 +101,9 @@ class NsfwNet(object):
 
         # Scores is the array containing SFW / NSFW image probabilities
         # scores[1] indicates the NSFW probability
-        print "NSFW score:  " , scores[1]
+        return scores[1]
 
+nsfwnet = NsfwNet()
 
 if __name__ == "__main__":
     import glob

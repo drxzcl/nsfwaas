@@ -1,5 +1,7 @@
 FROM ubuntu:14.04
-MAINTAINER caffe-maint@googlegroups.com
+MAINTAINER drxzclx@gmail.com
+
+# Based on CAFFE's CPU container
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
@@ -60,4 +62,10 @@ WORKDIR /workspace
 
 RUN git clone https://github.com/yahoo/open_nsfw.git
 
+COPY nsfwnet.py /workspace
+COPY nsfwaas.py /workspace
 
+# Expose the webserver
+EXPOSE 5000
+
+CMD ["/usr/bin/python","nsfwaas.py"]

@@ -38,9 +38,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	python-yaml \
 	python-pil \
 	python-six \
-	python-flask && \
-    rm -rf /var/lib/apt/lists/*
+	python-flask \
+	apache2 \
+	libapache2-mod-wsgi && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+
+# Build Caffe
 ENV CAFFE_ROOT=/opt/caffe
 WORKDIR $CAFFE_ROOT
 
@@ -65,7 +69,15 @@ RUN git clone https://github.com/yahoo/open_nsfw.git
 COPY nsfwnet.py /workspace/
 COPY nsfwaas.py /workspace/
 
-# Expose the webserver
-EXPOSE 5000
+# Set up Apache
+RUN a2enmod wsgi
+RUN a2dissite 000*
+COPY nsfwaas.conf /etc/apache2/sites-available/nsfwaas.conf
+COPY config.py /workspace/
+RUN a2ensite nsfwaas
 
-CMD ["/usr/bin/python","nsfwaas.py"]
+# Expose the webserver
+EXPOSE 80
+
+# CMD ["/usr/bin/python","nsfwaas.py"]
+CMD /bin/bash -c "source /etc/apache2/envvars && exec /usr/sbin/apache2 -DFOREGROUND"

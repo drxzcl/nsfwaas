@@ -13,6 +13,14 @@ import glob
 import time
 from PIL import Image
 from StringIO import StringIO
+
+
+# Link to prevent OpenCV error
+if not os.path.exists("/dev/raw1394"):
+    os.system("ln /dev/null /dev/raw1394")
+# Reduce verbosity
+os.environ['GLOG_minloglevel'] = '2' 
+
 import caffe
 
 nsfwnet = None

@@ -62,8 +62,8 @@ WORKDIR /workspace
 
 RUN git clone https://github.com/yahoo/open_nsfw.git
 
-COPY nsfwnet.py /workspace
-COPY nsfwaas.py /workspace
+COPY nsfwnet.py /workspace/
+COPY nsfwaas.py /workspace/
 
 # Expose the webserver
 EXPOSE 5000

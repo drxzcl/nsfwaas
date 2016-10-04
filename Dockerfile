@@ -40,7 +40,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	python-six \
 	python-flask \
 	apache2 \
-	libapache2-mod-wsgi && \
+	libapache2-mod-wsgi \
+	supervisor && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 
@@ -64,8 +65,8 @@ RUN echo "$CAFFE_ROOT/build/lib" >> /etc/ld.so.conf.d/caffe.conf && ldconfig
 
 WORKDIR /workspace
 
+# Clone the model and deploy the app server
 RUN git clone https://github.com/yahoo/open_nsfw.git
-
 COPY nsfwnet.py /workspace/
 COPY nsfwaas.py /workspace/
 
@@ -76,8 +77,12 @@ COPY nsfwaas.conf /etc/apache2/sites-available/nsfwaas.conf
 COPY config.py /workspace/
 RUN a2ensite nsfwaas
 
+# Configure supervisord
+RUN mkdir -p /var/lock/apache2 /var/run/apache2 /var/log/supervisor
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
 # Expose the webserver
 EXPOSE 80
 
-# CMD ["/usr/bin/python","nsfwaas.py"]
-CMD /bin/bash -c "source /etc/apache2/envvars && exec /usr/sbin/apache2 -DFOREGROUND"
+# Start supervisord
+CMD ["/usr/bin/supervisord"]
